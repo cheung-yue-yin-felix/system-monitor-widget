@@ -1,6 +1,7 @@
 # .NET build output
 bin/
 obj/
+publish/
 /packages/
 riderModule.iml
 /_ReSharper.Caches/
