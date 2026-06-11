@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\HardwareMonitor.Application\HardwareMonitor.Application.csproj" />
+      <ProjectReference Include="..\HardwareMonitor.Domain\HardwareMonitor.Domain.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Hardware.Info" Version="110.0.0.1" />
+      <PackageReference Include="Hardware.Info.Core" Version="110.0.0.1" />
+      <PackageReference Include="LibreHardwareMonitorLib" Version="0.9.6" />
+      <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.0" />
+    </ItemGroup>
+
+</Project>

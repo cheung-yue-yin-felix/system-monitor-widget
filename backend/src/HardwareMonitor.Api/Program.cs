@@ -1,0 +1,98 @@
+using System.Diagnostics;
+using System.Text.Json;
+using HardwareMonitor.Api.Authentications;
+using HardwareMonitor.Application;
+using HardwareMonitor.Infrastructure;
+using HardwareMonitor.Application.Interfaces;
+
+
+var exePath = Process.GetCurrentProcess().MainModule?.FileName;
+var applicationFolder = Path.GetDirectoryName(exePath);
+
+if (!string.IsNullOrEmpty(applicationFolder))
+{
+    // 2. Force Windows to shift its working directory out of System32 into the real app folder
+    Environment.CurrentDirectory = applicationFolder;
+}
+
+var isEmbedded = args.Contains("--embedded");
+
+var builder = WebApplication.CreateBuilder(args);
+
+// Add services to the container.
+// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+builder.Services.AddOpenApi();
+
+builder.Services.AddApplicationServices();
+builder.Services.AddInfrastructureServices();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        if (isEmbedded)
+        {
+            // When bundled inside Electron, requests come from file:// protocol
+            policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+        }
+        else
+        {
+            policy.WithOrigins(
+                    "https://cheung-yue-yin-felix.github.io",
+                    "https://system-monitor",
+                    "http://localhost:5173")
+                .AllowAnyMethod()
+                .AllowAnyHeader();
+        }
+    });
+});
+
+var app = builder.Build();
+
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
+{
+    app.MapOpenApi();
+}
+
+app.UseCors("AllowFrontend");
+
+if (!isEmbedded)
+{
+    app.UseHttpsRedirection();
+    app.UseMiddleware<ApiKeyMiddleware>();
+}
+
+var jsonOptions = new JsonSerializerOptions
+{
+    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+    DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
+};
+
+app.MapGet("api/metrics", (IHardwareMetricsCache cache) =>
+    {
+        var metrics = cache.Latest;
+        return metrics is not null 
+            ? Results.Json(metrics, jsonOptions) 
+            : Results.Problem("Metrics not yet available", statusCode: 503);
+    })
+    .WithName("GetHardwareMetrics");
+
+app.MapGet("api/metrics/stream", async (
+    HttpContext context,
+    IHardwareMetricsCache cache,
+    CancellationToken cancellationToken) =>
+{
+    context.Response.Headers.Append("Content-Type", "text/event-stream");
+    context.Response.Headers.Append("Cache-Control", "no-cache");
+    context.Response.Headers.Append("Connection", "keep-alive");
+    
+    await foreach (var metrics in cache.StreamAsync(cancellationToken))
+    {
+        var json = JsonSerializer.Serialize(metrics, jsonOptions);
+        await context.Response.WriteAsync($"data: {json}\n\n", cancellationToken);
+        await context.Response.Body.FlushAsync(cancellationToken);
+    }
+}).WithName("GetMetricsStream");
+
+app.Run();

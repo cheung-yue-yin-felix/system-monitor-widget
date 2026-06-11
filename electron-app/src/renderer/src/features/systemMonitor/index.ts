@@ -1,0 +1,5 @@
+﻿export { default as CpuCard } from './components/CpuCard';
+export { default as RamCard } from './components/RamCard';
+export { default as GpuCard } from './components/GpuCard';
+export { default as NetworkCard } from './components/NetworkCard';
+export { default as DiskCard } from './components/DiskCard';

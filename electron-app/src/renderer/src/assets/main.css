@@ -1,0 +1,63 @@
+@import './base.css';
+
+.current-weather-icon {
+  width: 128px;
+  height: 128px;
+}
+
+.hardware-icon {
+  overflow: hidden;
+  grid-column: 1 / 3;
+}
+
+.hardware-icon img {
+  width: 30%;
+  height: 30%;
+  filter: drop-shadow(0px 100px 0 ivory) brightness(90%);
+  transform: translateY(-100px);
+}
+
+.main-grid {
+  display: grid;
+  grid-template-columns: repeat(3, max-content);
+  justify-content: center;
+  align-items: center;
+  justify-items: center;
+  list-style: none;
+  gap: 10px;
+}
+
+/* Landscape / 16:9 and wider → 4 columns */
+@media (min-aspect-ratio: 16/9) {
+  .main-grid {
+    grid-template-columns: repeat(4, max-content);
+  }
+}
+
+/* Portrait / 9:16 and taller → 3 columns (default, explicit for clarity) */
+@media (max-aspect-ratio: 9/16) {
+  .main-grid {
+    grid-template-columns: repeat(3, max-content);
+  }
+}
+
+/* Span all columns regardless of grid size */
+.grid-span-all {
+  grid-column: 1 / -1;
+}
+
+.card {
+  width: calc(300px / var(--dpr));
+  height: calc(300px / var(--dpr));
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  border-radius: 18px;
+  font-family: "Tektur", sans-serif;
+  color: white;
+  margin: 0 auto;
+  position: relative;
+  padding: 18px 22px;
+}
