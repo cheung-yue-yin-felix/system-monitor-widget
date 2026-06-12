@@ -3,6 +3,7 @@ import Layout from "./components/Layout";
 import SettingsPage from './pages/SettingsPage'
 import MainPage from './pages/MainPage';
 import SystemPage from './pages/SystemPage';
+import MonitorsPage from './pages/MonitorsPage';
 
 const routes: RouteObject[] = [
   {
@@ -22,6 +23,10 @@ const routes: RouteObject[] = [
         element: <SystemPage />
       }
     ]
+  },
+  {
+    path: "/monitors",
+    element: <MonitorsPage />
   }
 ];
 

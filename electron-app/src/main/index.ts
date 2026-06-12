@@ -1,38 +1,120 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron'
-import { join } from 'path'
+import { app, shell, BrowserWindow, screen, Tray, Menu } from 'electron'
+import type { MenuItemConstructorOptions } from 'electron'
+import { join, dirname } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
-import icon from '../../resources/icon.png?asset'
+import icon from '../../resources/monitoring-system.png?asset'
+import { spawn } from 'child_process'
+import { existsSync } from 'fs'
 
-function createWindow(): void {
-  // Create the browser window.
-  const mainWindow = new BrowserWindow({
-    width: 900,
-    height: 670,
-    show: false,
-    autoHideMenuBar: true,
-    ...(process.platform === 'linux' ? { icon } : {}),
-    webPreferences: {
-      preload: join(__dirname, '../preload/index.js'),
-      sandbox: false
+function identifyMonitors(displays: Electron.Display[]): void {
+  displays.forEach((display, index) => {
+    const window = new BrowserWindow({
+      frame: false,
+      show: false,
+      transparent: true,
+      x: display.workArea.x,
+      y: display.workArea.y,
+    })
+
+    if (screen.getPrimaryDisplay().id === display.id) {
+      window.setSize(display.workArea.width, display.workArea.height)
+    } else {
+      window.setFullScreen(true)
+    }
+
+    window.on('ready-to-show', () => {
+      window.show()
+      setTimeout(() => {
+        window.close()
+      }, 3000)
+    })
+
+    if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
+      window.loadURL(`${process.env['ELECTRON_RENDERER_URL']}/#monitors?id=${index + 1}`)
+    } else {
+      window.loadFile(join(__dirname, '../renderer/index.html'), {
+        hash: `monitors?id=${index + 1}`
+      })
     }
   })
+}
 
-  mainWindow.on('ready-to-show', () => {
-    mainWindow.show()
+function createWindow(page: string, display: Electron.Display): void {
+  const window = new BrowserWindow({
+    x: display.workArea.x,
+    y: display.workArea.y,
+    transparent: true,
+    frame: false,
+    show: false,
+  });
+
+  if (screen.getPrimaryDisplay().id === display.id) {
+    window.setSize(display.workArea.width, display.workArea.height)
+  } else {
+    window.setFullScreen(true)
+  }
+
+  window.on('ready-to-show', () => {
+    window.show()
   })
 
-  mainWindow.webContents.setWindowOpenHandler((details) => {
+  window.webContents.setWindowOpenHandler((details) => {
     shell.openExternal(details.url)
     return { action: 'deny' }
   })
 
-  // HMR for renderer base on electron-vite cli.
-  // Load the remote URL for development or the local html file for production.
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
-    mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
+    window.loadURL(process.env['ELECTRON_RENDERER_URL'] + (page.length > 0 ? `/#${page}` : ''))
+  } else if (page.length > 0) {
+    window.loadFile(join(__dirname, '../renderer/index.html'), { hash: page })
   } else {
-    mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
+    window.loadFile(join(__dirname, '../renderer/index.html'))
   }
+}
+
+let tray: Tray | null = null
+
+function toPascalCase(str: string): string {
+  return str
+    .toLowerCase()
+    .replace(/[^\w\s-]/g, '') // Remove punctuation
+    .replace(/(?:^|[^a-zA-Z0-9]+)(.)/g, (_, chr) => chr.toUpperCase());
+}
+
+function createTrayMenu(displays: Electron.Display[]): void {
+  tray = new Tray(icon)
+  const pages = ['', 'system', 'settings']
+  const template: MenuItemConstructorOptions[] = []
+
+  template.push({ label: 'Identify', click: () => identifyMonitors(displays) })
+
+  template.push({ type: 'separator' })
+
+  pages.forEach(page => {
+    const subMenu: MenuItemConstructorOptions[] = []
+
+    displays.forEach((display, index) => {
+      subMenu.push({
+        label: `@${index + 1}:${display.workArea.width}x${display.workArea.height}`,
+        click: () => createWindow(page, display)
+      })
+    })
+
+    template.push({ label: page.length > 0 ? `Open ${toPascalCase(page)}` : 'Open Main', type: 'submenu', submenu: subMenu })
+  })
+
+  template.push({ type: 'separator' })
+
+  template.push({
+    label: 'Close All Windows',
+    click: () => BrowserWindow.getAllWindows().forEach((window) => window.close())
+  })
+
+  template.push({ role: 'quit' })
+
+  const contextMenu = Menu.buildFromTemplate(template)
+
+  tray.setContextMenu(contextMenu)
 }
 
 // This method will be called when Electron has finished
@@ -49,15 +131,47 @@ app.whenReady().then(() => {
     optimizer.watchWindowShortcuts(window)
   })
 
-  // IPC test
-  ipcMain.on('ping', () => console.log('pong'))
+  const displays: Electron.Display[] = screen.getAllDisplays()
 
-  createWindow()
+  const shouldSpawnBackend = process.env.ELECTRON_NO_BACKEND_SPAWN !== 'true'
+  let backend: ReturnType<typeof spawn> | undefined
+
+  if (shouldSpawnBackend) {
+    const backendPath = is.dev
+      ? join(process.cwd(), '..', 'backend', 'publish', 'HardwareMonitor.Api.exe')
+      : join(process.resourcesPath, '..', 'backend', 'HardwareMonitor.Api.exe')
+
+    if (!existsSync(backendPath)) {
+      console.error(`[Main] Backend executable not found: ${backendPath}`)
+      console.error('[Main] Run "dotnet publish" for the backend first.')
+    } else {
+      backend = spawn(backendPath, ['--embedded'], {
+        cwd: dirname(backendPath),
+        env: {
+          ...process.env,
+          ASPNETCORE_URLS: 'http://localhost:5000'
+        }
+      })
+
+      backend.stdout?.on('data', (data) => console.log(`[Backend] ${data}`))
+      backend.stderr?.on('data', (data) => console.error(`[Backend] ${data}`))
+    }
+  } else {
+    console.log('[Main] ELECTRON_NO_BACKEND_SPAWN is set; using external backend')
+  }
+
+  createTrayMenu(displays)
+
+  app.on('before-quit', () => {
+    backend?.kill()
+  })
 
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
-    if (BrowserWindow.getAllWindows().length === 0) createWindow()
+    if (BrowserWindow.getAllWindows().length === 0) {
+      createWindow('', screen.getPrimaryDisplay())
+    }
   })
 })
 
@@ -65,10 +179,8 @@ app.whenReady().then(() => {
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit()
-  }
+  // if (process.platform !== 'darwin') {
+  //   app.quit()
+  // }
 })
 
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and require them here.
