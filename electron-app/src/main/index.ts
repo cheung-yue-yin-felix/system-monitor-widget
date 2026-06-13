@@ -2,7 +2,7 @@ import { app, shell, BrowserWindow, screen, Tray, Menu } from 'electron'
 import type { MenuItemConstructorOptions } from 'electron'
 import { join, dirname } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
-import icon from '../../resources/monitoring-system.png?asset'
+import icon from '../../resources/icon.png?asset'
 import { spawn } from 'child_process'
 import { existsSync } from 'fs'
 
@@ -12,6 +12,7 @@ function identifyMonitors(displays: Electron.Display[]): void {
       frame: false,
       show: false,
       transparent: true,
+      skipTaskbar: true,
       x: display.workArea.x,
       y: display.workArea.y,
     })
@@ -46,6 +47,7 @@ function createWindow(page: string, display: Electron.Display): void {
     transparent: true,
     frame: false,
     show: false,
+    skipTaskbar: true,
   });
 
   if (screen.getPrimaryDisplay().id === display.id) {
@@ -86,6 +88,8 @@ function createTrayMenu(displays: Electron.Display[]): void {
   const pages = ['', 'system', 'settings']
   const template: MenuItemConstructorOptions[] = []
 
+  tray.setToolTip(app.name)
+
   template.push({ label: 'Identify', click: () => identifyMonitors(displays) })
 
   template.push({ type: 'separator' })
@@ -122,7 +126,7 @@ function createTrayMenu(displays: Electron.Display[]): void {
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
   // Set app user model id for windows
-  electronApp.setAppUserModelId('com.electron')
+  electronApp.setAppUserModelId('com.cheungyueyinfelix.systemmonitorwidget')
 
   // Default open or close DevTools by F12 in development
   // and ignore CommandOrControl + R in production.
@@ -139,7 +143,7 @@ app.whenReady().then(() => {
   if (shouldSpawnBackend) {
     const backendPath = is.dev
       ? join(process.cwd(), '..', 'backend', 'publish', 'HardwareMonitor.Api.exe')
-      : join(process.resourcesPath, '..', 'backend', 'HardwareMonitor.Api.exe')
+      : join(process.resourcesPath, 'backend', 'HardwareMonitor.Api.exe')
 
     if (!existsSync(backendPath)) {
       console.error(`[Main] Backend executable not found: ${backendPath}`)
@@ -162,9 +166,21 @@ app.whenReady().then(() => {
 
   createTrayMenu(displays)
 
-  app.on('before-quit', () => {
-    backend?.kill()
-  })
+  function killBackend(): void {
+    if (!backend) return
+
+    if (process.platform === 'win32' && backend.pid) {
+      spawn('taskkill', ['/F', '/T', '/PID', backend.pid.toString()], {
+        shell: true,
+        windowsHide: true
+      })
+    } else {
+      backend.kill('SIGKILL')
+    }
+  }
+
+  app.on('before-quit', killBackend)
+  app.on('will-quit', killBackend)
 
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the

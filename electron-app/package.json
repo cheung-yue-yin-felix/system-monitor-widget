@@ -1,9 +1,9 @@
 {
-  "name": "electron-app",
+  "name": "SystemMonitorWidget",
   "version": "1.0.0",
-  "description": "An Electron application with React and TypeScript",
+  "description": "A widget that display current date, time, weather and monitor PC hardware on Windows",
   "main": "./out/main/index.js",
-  "author": "example.com",
+  "author": "Cheung Yue Yin Felix",
   "homepage": "https://electron-vite.org",
   "scripts": {
     "format": "prettier --write .",
