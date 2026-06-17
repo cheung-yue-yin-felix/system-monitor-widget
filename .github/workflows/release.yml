@@ -8,6 +8,8 @@ on:  # Defines when this workflow runs
 jobs:  # One or more jobs that run in this workflow
   release:  # Job ID; can be any name, "release" describes its purpose
     runs-on: windows-latest  # Use a Windows runner because this app builds a Windows .exe installer
+    permissions:
+      contents: write  # Allow electron-builder to create GitHub Releases and upload installer assets
 
     defaults:  # Default settings for all steps in this job
       run:
