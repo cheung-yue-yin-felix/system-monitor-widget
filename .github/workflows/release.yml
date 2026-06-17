@@ -45,6 +45,9 @@ jobs:  # One or more jobs that run in this workflow
       - name: Build and publish Electron app  # Display name for this step
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Token electron-builder uses to create the GitHub Release and upload assets
+          VITE_CSS_BACKGROUND_TRANSPARENT: ${{ variables.VITE_CSS_BACKGROUND_TRANSPARENT }}
+          VITE_BACKEND_URL: ${{ secrets.VITE_BACKEND_URL }}
+          VITE_API_KEY: ${{ secrets.VITE_API_KEY }}
         run: npm run build:win
 
       - name: Upload Artifacts to Single GitHub Release
