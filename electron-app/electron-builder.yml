@@ -1,5 +1,10 @@
 appId: com.cheungyueyinfelix.systemmonitorwidget
 productName: System Monitor Widget
+# Add this explicit block to override the duplicate inference bug
+publish:
+  provider: github
+  owner: cheung-yue-yin-felix
+  repo: system-monitor-widget
 directories:
   buildResources: build
 files:
