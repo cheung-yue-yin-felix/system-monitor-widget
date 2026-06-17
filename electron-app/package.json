@@ -5,6 +5,10 @@
   "main": "./out/main/index.js",
   "author": "Cheung Yue Yin Felix",
   "homepage": "https://electron-vite.org",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cheung-yue-yin-felix/system-monitor-widget.git"
+  },
   "scripts": {
     "format": "prettier --write .",
     "lint": "eslint --cache .",
