@@ -22,7 +22,7 @@
     "build": "npm run typecheck && electron-vite build",
     "postinstall": "electron-builder install-app-deps",
     "build:unpack": "npm run build && electron-builder --dir",
-    "build:win": "concurrently --max-processes 1 --kill-others-on-fail \"npm run build\" \"electron-builder --win --publish onTag\"",
+    "build:win": "concurrently --max-processes 1 --kill-others-on-fail \"npm run build\" \"electron-builder --win --publish onTag -c.publish=github\"",
     "build:mac": "electron-vite build && electron-builder --mac",
     "build:linux": "electron-vite build && electron-builder --linux"
   },
