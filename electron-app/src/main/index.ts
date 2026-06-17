@@ -3,8 +3,35 @@ import type { MenuItemConstructorOptions } from 'electron'
 import { join, dirname } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
-import { spawn } from 'child_process'
+import { spawn, exec } from 'child_process'
 import { existsSync } from 'fs'
+import { registerWeatherIpcHandlers } from './ipc/weatherIpc';
+
+function manageAdminStartup(enable: boolean = true): void {
+  if (process.platform !== 'win32' || is.dev) {
+    if (is.dev) console.log('Skipping Task Scheduler configuration in development')
+    return
+  }
+
+  const taskName: string = "SystemMonitorWidgetAdminStartup"
+  const appPath: string = app.getPath('exe')
+
+  let command: string = ''
+
+  if (enable) {
+    command = `schtasks /create /tn "${taskName}" /tr "\\"${appPath}"\\" /sc onlogon /rl HIGHEST /f`
+  } else {
+    command = `schtasks /delete /tn "${taskName}" /f`
+  }
+
+  exec(command, (error) => {
+    if (error) {
+      console.error(`[Task Scheduler Error]: ${error.message}`)
+      return
+    }
+    console.log(`[Task Scheduler Success]: Admin startup configured (Enabled: ${enable})`)
+  })
+}
 
 function identifyMonitors(displays: Electron.Display[]): void {
   displays.forEach((display, index) => {
@@ -15,6 +42,11 @@ function identifyMonitors(displays: Electron.Display[]): void {
       skipTaskbar: true,
       x: display.workArea.x,
       y: display.workArea.y,
+      webPreferences: {
+        preload: join(__dirname, '../preload/index.js'),
+        contextIsolation: true,
+        sandbox: false,
+      },
     })
 
     if (screen.getPrimaryDisplay().id === display.id) {
@@ -48,6 +80,11 @@ function createWindow(page: string, display: Electron.Display): void {
     frame: false,
     show: false,
     skipTaskbar: true,
+    webPreferences: {
+      preload: join(__dirname, '../preload/index.js'),
+      contextIsolation: true,
+      sandbox: false,
+    },
   });
 
   if (screen.getPrimaryDisplay().id === display.id) {
@@ -109,6 +146,10 @@ function createTrayMenu(displays: Electron.Display[]): void {
 
   template.push({ type: 'separator' })
 
+  template.push({ label: 'Auto Start', type: "checkbox", checked: true, click: (item) => manageAdminStartup(item.checked)})
+
+  template.push({ type: "separator" })
+
   template.push({
     label: 'Close All Windows',
     click: () => BrowserWindow.getAllWindows().forEach((window) => window.close())
@@ -134,6 +175,10 @@ app.whenReady().then(() => {
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)
   })
+
+  manageAdminStartup(true)
+
+  registerWeatherIpcHandlers()
 
   const displays: Electron.Display[] = screen.getAllDisplays()
 

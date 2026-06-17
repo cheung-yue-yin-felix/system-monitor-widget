@@ -1,18 +1,10 @@
-﻿import createExternalApi from './external';
-import { config } from '../configs/configs';
+﻿import type { CurrentWeatherResponse, WeatherForecastData } from '../../../shared/types/weather';
 
-const BASE_URL = config.weatherApi.baseUrl;
-const DEFAULT_HEADERS = config.weatherApi.defaultHeaders;
-const CURRENT_WEATHER_DATA_TYPE = config.weatherApi.dataTypeKey.currentWeather;
-const FORECAST_WEATHER_DATA_TYPE = config.weatherApi.dataTypeKey.forecastWeather;
-
-const weatherApi = createExternalApi(BASE_URL, DEFAULT_HEADERS);
-
-interface CurrentWeatherResponse {
-  icon: string[];
-  temperature: { data: Array<{ place: string; value: string; unit: string }> };
-  rainfall: { data: Array<{ place: string; max: string; unit: string }> };
-  humidity: { data: Array<{ value: string }> };
+interface CurrentWeatherResult {
+  icon: string;
+  temperature: { place: string; value: string; unit: string };
+  rainfall: { place: string; max: string; unit: string };
+  humidity: { value: string };
   warningMessage: string;
 }
 
@@ -20,14 +12,9 @@ export const fetchCurrentWeather = async (
   language: string,
   district: string,
   tempStation: string
-) => {
+): Promise<CurrentWeatherResult> => {
   try {
-    const data = (await weatherApi('/weather.php', {
-      params: {
-        dataType: CURRENT_WEATHER_DATA_TYPE,
-        lang: language,
-      },
-    })) as CurrentWeatherResponse;
+    const data = (await window.api.weather.getCurrent(language)) as CurrentWeatherResponse;
 
     const { icon, temperature, rainfall, humidity, warningMessage } = data;
 
@@ -36,7 +23,7 @@ export const fetchCurrentWeather = async (
       temperature: temperature.data.filter((d) => d.place === tempStation)[0],
       rainfall: rainfall.data.filter((d) => d.place === district)[0],
       humidity: humidity.data[0],
-      warningMessage: warningMessage,
+      warningMessage,
     };
   } catch (error) {
     console.error('Weather API error:', error instanceof Error ? error.message : String(error));
@@ -44,14 +31,9 @@ export const fetchCurrentWeather = async (
   }
 };
 
-export const fetchForecastWeather = async (language: string) => {
+export const fetchForecastWeather = async (language: string): Promise<WeatherForecastData> => {
   try {
-    return await weatherApi('/weather.php', {
-      params: {
-        dataType: FORECAST_WEATHER_DATA_TYPE,
-        lang: language,
-      },
-    });
+    return (await window.api.weather.getForecast(language)) as WeatherForecastData;
   } catch (error) {
     console.error('Weather API error:', error instanceof Error ? error.message : String(error));
     throw error;
