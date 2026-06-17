@@ -1,0 +1,33 @@
+﻿name: Release
+on:
+  push:
+    tags:
+      - 'v*'
+jobs:
+  release:
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: ./electron-app
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Install Node dependencies
+        run: npm ci
+      - name: Build backend
+        run: dotnet publish ../backend/src/HardwareMonitor.Api -c Release -o ../backend/publish
+      - name: Build and publish Electron app
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npm run build win -- --publish always
