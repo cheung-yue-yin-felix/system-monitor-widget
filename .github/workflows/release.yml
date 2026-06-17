@@ -1,0 +1,48 @@
+﻿name: Release  # Display name shown in the GitHub Actions tab
+
+on:  # Defines when this workflow runs
+  push:  # Run when code is pushed to the repository
+    tags:  # Only run when the push includes tags
+      - 'v*'  # Only run for tags starting with "v", such as v1.0.0
+
+jobs:  # One or more jobs that run in this workflow
+  release:  # Job ID; can be any name, "release" describes its purpose
+    runs-on: windows-latest  # Use a Windows runner because this app builds a Windows .exe installer
+
+    defaults:  # Default settings for all steps in this job
+      run:
+        working-directory: ./electron-app  # All run commands execute inside the electron-app folder
+
+    steps:  # The tasks this job performs, in order
+
+      - name: Checkout repository  # Display name for this step
+        uses: actions/checkout@v4  # Official GitHub action to clone the repo onto the runner
+        with:
+          fetch-depth: 0  # Fetch full git history so electron-builder can read version tags correctly
+
+      - name: Setup Node.js  # Display name for this step
+        uses: actions/setup-node@v4  # Official action to install Node.js
+        with:
+          node-version: 22  # Install Node.js 22, matching your project's Electron 39 stack
+          cache: npm  # Cache node_modules between runs to speed up installs
+
+      - name: Setup .NET  # Display name for this step
+        uses: actions/setup-dotnet@v4  # Official action to install the .NET SDK
+        with:
+          dotnet-version: '10.0.x'  # Install latest .NET 10 SDK; matches HardwareMonitor.Api.csproj TargetFramework net10.0
+
+      - name: Install Node dependencies  # Display name for this step
+        run: npm ci  # Install dependencies from package-lock.json in a strict, reproducible way
+
+      - name: Build backend  # Display name for this step
+        run: dotnet publish ../backend/src/HardwareMonitor.Api -c Release -o ../backend/publish
+        # Builds the .NET backend in Release mode
+        # -o ../backend/publish outputs files to the folder electron-builder copies via extraResources
+
+      - name: Build and publish Electron app  # Display name for this step
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Token electron-builder uses to create the GitHub Release and upload assets
+        run: npm run build:win -- --publish always
+        # npm run build:win runs typecheck + electron-vite build + electron-builder for Windows
+        # -- forwards the next argument to electron-builder
+        # --publish always tells electron-builder to upload the installer to GitHub Releases
