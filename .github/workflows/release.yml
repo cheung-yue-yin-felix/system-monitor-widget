@@ -45,7 +45,6 @@ jobs:  # One or more jobs that run in this workflow
       - name: Build and publish Electron app  # Display name for this step
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Token electron-builder uses to create the GitHub Release and upload assets
-        run: npm run build:win -- --publish always
-        # npm run build:win runs typecheck + electron-vite build + electron-builder for Windows
-        # -- forwards the next argument to electron-builder
-        # --publish always tells electron-builder to upload the installer to GitHub Releases
+        run: npm run build:win
+        # Uses concurrently --max-processes 1 to run build and packaging sequentially,
+        # then uploads the installer to GitHub Releases via --publish always in the script
