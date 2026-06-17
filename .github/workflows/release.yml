@@ -21,10 +21,11 @@ jobs:  # One or more jobs that run in this workflow
           fetch-depth: 0  # Fetch full git history so electron-builder can read version tags correctly
 
       - name: Setup Node.js  # Display name for this step
-        uses: actions/setup-node@v4  # Official action to install Node.js
+        uses: actions/setup-node@v5  # Official action to install Node.js; v5 avoids GitHub's Node 20 runtime deprecation
         with:
           node-version: 22  # Install Node.js 22, matching your project's Electron 39 stack
           cache: npm  # Cache node_modules between runs to speed up installs
+          cache-dependency-path: './electron-app/package-lock.json'  # Tell setup-node where the lock file is
 
       - name: Setup .NET  # Display name for this step
         uses: actions/setup-dotnet@v4  # Official action to install the .NET SDK
