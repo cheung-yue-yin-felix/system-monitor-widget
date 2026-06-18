@@ -1,11 +1,21 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
+import type { Settings } from '../shared/types/settings'
 
 // Custom APIs for renderer
 const api = {
   weather: {
     getCurrent: (language: string) => ipcRenderer.invoke('weather:getCurrent', language),
     getForecast: (language: string) => ipcRenderer.invoke('weather:getForecast', language)
+  },
+  settings: {
+    get: () => ipcRenderer.invoke('settings:get'),
+    set: (settings: Settings) => ipcRenderer.send('settings:set', settings),
+    onChange: (callback: (settings: Settings) => void) => {
+      const handler = (_: unknown, settings: Settings): void => callback(settings)
+      ipcRenderer.on('settings:changed', handler)
+      return () => ipcRenderer.off('settings:changed', handler)
+    }
   }
 }
 

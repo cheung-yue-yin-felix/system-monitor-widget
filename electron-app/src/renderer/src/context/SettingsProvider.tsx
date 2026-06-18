@@ -1,7 +1,7 @@
 ﻿import { useEffect, useState, useCallback, useMemo, type ReactNode } from 'react'
 import SettingsContext from './settings-context'
 import { loadSettings, saveSettings } from '../hooks/useSettings'
-import type { Language, SettingsContextValue } from '../types/settings'
+import type { Language, Settings, SettingsContextValue } from '../types/settings'
 import i18n from '../i18n'
 
 interface SettingsProviderProps {
@@ -9,7 +9,24 @@ interface SettingsProviderProps {
 }
 
 const SettingsProvider = ({ children }: SettingsProviderProps): React.JSX.Element => {
-  const [settings, setSettings] = useState(() => loadSettings())
+  const [settings, setSettings] = useState<Settings>(() => loadSettings())
+
+  useEffect(() => {
+    window.api.settings
+      .get()
+      .then((loaded) => {
+        setSettings((prev) => ({ ...prev, ...loaded }))
+      })
+      .catch((error) => {
+        console.error('[SettingsProvider] Failed to load settings:', error)
+      })
+  }, [])
+
+  useEffect(() => {
+    return window.api.settings.onChange((next) => {
+      setSettings((prev) => ({ ...prev, ...next }))
+    })
+  }, [])
 
   useEffect(() => {
     saveSettings(settings)
@@ -20,29 +37,55 @@ const SettingsProvider = ({ children }: SettingsProviderProps): React.JSX.Elemen
     i18n.changeLanguage(settings.language)
   }, [settings.language])
 
-  const setLanguage = useCallback((language: Language) => {
-    setSettings((prev) => ({ ...prev, language }))
+  const updateSettings = useCallback((updater: (prev: Settings) => Settings) => {
+    setSettings((prev) => {
+      const next = updater(prev)
+      window.api.settings.set(next)
+      return next
+    })
   }, [])
 
-  const setDateFormat = useCallback((format: string) => {
-    setSettings((prev) => ({ ...prev, dateFormat: format }))
-  }, [])
+  const setLanguage = useCallback(
+    (language: Language) => {
+      updateSettings((prev) => ({ ...prev, language }))
+    },
+    [updateSettings]
+  )
 
-  const setTimeFormat = useCallback((format: string) => {
-    setSettings((prev) => ({ ...prev, timeFormat: format }))
-  }, [])
+  const setDateFormat = useCallback(
+    (format: string) => {
+      updateSettings((prev) => ({ ...prev, dateFormat: format }))
+    },
+    [updateSettings]
+  )
 
-  const setWeekDayFormat = useCallback((format: string) => {
-    setSettings((prev) => ({ ...prev, weekDayFormat: format }))
-  }, [])
+  const setTimeFormat = useCallback(
+    (format: string) => {
+      updateSettings((prev) => ({ ...prev, timeFormat: format }))
+    },
+    [updateSettings]
+  )
 
-  const setDistrict = useCallback((district: string) => {
-    setSettings((prev) => ({ ...prev, district }))
-  }, [])
+  const setWeekDayFormat = useCallback(
+    (format: string) => {
+      updateSettings((prev) => ({ ...prev, weekDayFormat: format }))
+    },
+    [updateSettings]
+  )
 
-  const setTempStation = useCallback((station: string) => {
-    setSettings((prev) => ({ ...prev, tempStation: station }))
-  }, [])
+  const setDistrict = useCallback(
+    (district: string) => {
+      updateSettings((prev) => ({ ...prev, district }))
+    },
+    [updateSettings]
+  )
+
+  const setTempStation = useCallback(
+    (station: string) => {
+      updateSettings((prev) => ({ ...prev, tempStation: station }))
+    },
+    [updateSettings]
+  )
 
   const value = useMemo<SettingsContextValue>(
     () => ({

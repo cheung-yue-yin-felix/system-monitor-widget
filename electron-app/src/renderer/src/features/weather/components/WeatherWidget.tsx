@@ -3,7 +3,7 @@ import { useWeather } from '../hooks'
 import { useTranslation } from 'react-i18next'
 import Loading from '../../../components/Loading'
 import ErrorMessage from '../../../components/ErrorMessage'
-import { useMemo, type React } from 'react'
+import React, { useMemo } from 'react'
 
 export default function WeatherWidget(): React.JSX.Element {
   const dpr = window.devicePixelRatio

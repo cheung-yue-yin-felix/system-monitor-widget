@@ -6,6 +6,7 @@ import icon from '../../resources/icon.png?asset'
 import { spawn, exec } from 'child_process'
 import { existsSync } from 'fs'
 import { registerWeatherIpcHandlers } from './ipc/weatherIpc'
+import { registerSettingsIpcHandlers } from './ipc/settingsIpc'
 
 function manageAdminStartup(enable: boolean = true): void {
   if (process.platform !== 'win32' || is.dev) {
@@ -188,6 +189,7 @@ app.whenReady().then(() => {
   manageAdminStartup(true)
 
   registerWeatherIpcHandlers()
+  registerSettingsIpcHandlers()
 
   const displays: Electron.Display[] = screen.getAllDisplays()
 

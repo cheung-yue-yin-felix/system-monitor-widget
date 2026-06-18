@@ -12,6 +12,13 @@ declare global {
           language: string
         ) => Promise<import('../shared/types/weather').WeatherForecastData>
       }
+      settings: {
+        get: () => Promise<import('../shared/types/settings').Settings>
+        set: (settings: import('../shared/types/settings').Settings) => void
+        onChange: (
+          callback: (settings: import('../shared/types/settings').Settings) => void
+        ) => () => void
+      }
     }
   }
 }

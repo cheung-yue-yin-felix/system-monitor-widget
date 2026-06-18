@@ -1,16 +1,8 @@
 ﻿import { HONG_KONG_DISTRICTS } from '../constants/districts'
 import { TEMP_STATIONS } from '../constants/tempStations'
+import type { Language, Settings } from '../../../shared/types/settings'
 
-export type Language = 'en' | 'tc' | 'sc'
-
-export interface Settings {
-  language: Language
-  dateFormat: string
-  timeFormat: string
-  weekDayFormat: string
-  district: string
-  tempStation: string
-}
+export type { Language, Settings }
 
 export interface SettingsContextValue extends Settings {
   setLanguage: (language: Language) => void
