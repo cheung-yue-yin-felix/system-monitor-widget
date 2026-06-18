@@ -1,13 +1,13 @@
-﻿import { createHashRouter, RouteObject } from "react-router-dom";
-import Layout from "./components/Layout";
+﻿import { createHashRouter, RouteObject } from 'react-router-dom'
+import Layout from './components/Layout'
 import SettingsPage from './pages/SettingsPage'
-import MainPage from './pages/MainPage';
-import SystemPage from './pages/SystemPage';
-import MonitorsPage from './pages/MonitorsPage';
+import MainPage from './pages/MainPage'
+import SystemPage from './pages/SystemPage'
+import MonitorsPage from './pages/MonitorsPage'
 
 const routes: RouteObject[] = [
   {
-    path: "/",
+    path: '/',
     element: <Layout />,
     children: [
       {
@@ -25,9 +25,9 @@ const routes: RouteObject[] = [
     ]
   },
   {
-    path: "/monitors",
+    path: '/monitors',
     element: <MonitorsPage />
   }
-];
+]
 
 export const router = createHashRouter(routes)

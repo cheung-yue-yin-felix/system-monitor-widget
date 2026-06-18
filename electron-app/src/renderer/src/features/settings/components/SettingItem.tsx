@@ -1,26 +1,26 @@
-﻿import type { ChangeEvent } from 'react';
+﻿import type { ChangeEvent } from 'react'
 
 export interface Option {
-  value: string;
-  label: string;
+  value: string
+  label: string
 }
 
 interface SettingItemProps {
-  label: string;
-  value: string;
-  options: Option[];
-  onChange: (value: string) => void;
+  label: string
+  value: string
+  options: Option[]
+  onChange: (value: string) => void
 }
 
 export default function SettingItem({
-                                      label,
-                                      value,
-                                      options,
-                                      onChange,
-                                    }: SettingItemProps) {
-  const handleChange = (e: ChangeEvent<HTMLSelectElement>) => {
-    onChange(e.target.value);
-  };
+  label,
+  value,
+  options,
+  onChange
+}: SettingItemProps): React.JSX.Element {
+  const handleChange = (e: ChangeEvent<HTMLSelectElement>): void => {
+    onChange(e.target.value)
+  }
 
   return (
     <div
@@ -33,7 +33,7 @@ export default function SettingItem({
         borderRadius: '10px',
         background: 'rgba(255, 255, 255, 0.1)',
         border: '1px solid rgba(255, 255, 255, 0.15)',
-        fontFamily: '"Montserrat", sans-serif',
+        fontFamily: '"Montserrat", sans-serif'
       }}
     >
       <span
@@ -41,7 +41,7 @@ export default function SettingItem({
           fontSize: '0.9rem',
           fontWeight: 500,
           color: 'white',
-          whiteSpace: 'nowrap',
+          whiteSpace: 'nowrap'
         }}
       >
         {label}
@@ -59,7 +59,7 @@ export default function SettingItem({
           fontFamily: 'inherit',
           cursor: 'pointer',
           outline: 'none',
-          minWidth: '120px',
+          minWidth: '120px'
         }}
       >
         {options.map((option) => (
@@ -68,7 +68,7 @@ export default function SettingItem({
             value={option.value}
             style={{
               background: '#1a1a1a',
-              color: 'white',
+              color: 'white'
             }}
           >
             {option.label}
@@ -76,5 +76,5 @@ export default function SettingItem({
         ))}
       </select>
     </div>
-  );
+  )
 }

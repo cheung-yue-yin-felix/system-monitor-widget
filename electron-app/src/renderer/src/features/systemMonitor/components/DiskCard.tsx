@@ -1,14 +1,14 @@
-﻿import { useTranslation } from 'react-i18next';
-import type React from 'react';
-import type { DiskMetrics } from '../../../types/hardware';
+﻿import { useTranslation } from 'react-i18next'
+import type React from 'react'
+import type { DiskMetrics } from '../../../types/hardware'
 
 interface DiskCardProps {
-  disk: DiskMetrics;
+  disk: DiskMetrics
 }
 
 export default function DiskCard({ disk }: DiskCardProps): React.JSX.Element {
-  const { t } = useTranslation();
-  const dpr = window.devicePixelRatio;
+  const { t } = useTranslation()
+  const dpr = window.devicePixelRatio
 
   return (
     <>
@@ -17,22 +17,24 @@ export default function DiskCard({ disk }: DiskCardProps): React.JSX.Element {
           <div
             key={`${disk.name}-${volume.name}-${pIndex}`}
             className="card"
-            style={{
-              '--dpr': dpr,
-              display: 'grid',
-              gridTemplateColumns: '100px 150px',
-              gap: '0px',
-              alignItems: 'center',
-              textAlign: 'center',
-              fontSize: '18px',
-            } as React.CSSProperties}
+            style={
+              {
+                '--dpr': dpr,
+                display: 'grid',
+                gridTemplateColumns: '100px 150px',
+                gap: '0px',
+                alignItems: 'center',
+                textAlign: 'center',
+                fontSize: '18px'
+              } as React.CSSProperties
+            }
           >
             <div className="hardware-icon">
               <img src={'./hardware_icons/storage-device.png'} alt="storage-device" />
             </div>
             <div
               style={{
-                gridColumn: '1 / 3',
+                gridColumn: '1 / 3'
               }}
             >
               {disk.name}
@@ -47,5 +49,5 @@ export default function DiskCard({ disk }: DiskCardProps): React.JSX.Element {
         ))
       )}
     </>
-  );
+  )
 }

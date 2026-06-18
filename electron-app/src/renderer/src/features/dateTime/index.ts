@@ -1,1 +1,1 @@
-﻿export { default as DateTimeWidget } from './components/DateTimeWidget';
+﻿export { default as DateTimeWidget } from './components/DateTimeWidget'

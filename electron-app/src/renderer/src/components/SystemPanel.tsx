@@ -1,14 +1,14 @@
-﻿import { CpuCard, GpuCard, RamCard, NetworkCard, DiskCard } from '../features/systemMonitor';
-import { useMetricsStream } from '../features/systemMonitor/hooks';
+﻿import { CpuCard, GpuCard, RamCard, NetworkCard, DiskCard } from '../features/systemMonitor'
+import { useMetricsStream } from '../features/systemMonitor/hooks'
 
-import ErrorMessage from './ErrorMessage';
-import Loading from './Loading';
-import type React from 'react';
+import ErrorMessage from './ErrorMessage'
+import Loading from './Loading'
+import type React from 'react'
 
 export default function SystemPanel(): React.JSX.Element {
-  const { data, status, error } = useMetricsStream();
+  const { data, status, error } = useMetricsStream()
 
-  console.log('Connection Status: ', status);
+  console.log('Connection Status: ', status)
 
   return (
     <>
@@ -46,5 +46,5 @@ export default function SystemPanel(): React.JSX.Element {
         </ul>
       )}
     </>
-  );
+  )
 }

@@ -11,6 +11,6 @@
   },
   systemMonitorApi: {
     baseUrl: import.meta.env.VITE_BACKEND_URL ?? '',
-    apiKey: import.meta.env.VITE_API_KEY ?? '',
+    apiKey: import.meta.env.VITE_API_KEY ?? ''
   }
-} as const;
+} as const

@@ -1,12 +1,12 @@
-﻿import { useSecondsRing } from '../hooks';
-import type React from 'react';
+﻿import { useSecondsRing } from '../hooks'
+import type React from 'react'
 
 interface SecondsRingProps {
-  seconds: number;
+  seconds: number
 }
 
 export default function SecondsRing({ seconds }: SecondsRingProps): React.JSX.Element {
-  const canvasRef = useSecondsRing(seconds);
+  const canvasRef = useSecondsRing(seconds)
 
   return (
     <canvas
@@ -17,8 +17,8 @@ export default function SecondsRing({ seconds }: SecondsRingProps): React.JSX.El
         height: '100%',
         zIndex: -1,
         borderRadius: '28px',
-        pointerEvents: 'none',
+        pointerEvents: 'none'
       }}
     />
-  );
+  )
 }

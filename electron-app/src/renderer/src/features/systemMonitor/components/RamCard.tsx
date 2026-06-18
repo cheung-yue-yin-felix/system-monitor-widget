@@ -1,29 +1,31 @@
-﻿import { useTranslation } from 'react-i18next';
-import type React from 'react';
-import type { RamMetrics } from '../../../types/hardware';
+﻿import { useTranslation } from 'react-i18next'
+import type React from 'react'
+import type { RamMetrics } from '../../../types/hardware'
 
 interface RamCardProps {
-  ram: RamMetrics;
+  ram: RamMetrics
 }
 
 export default function RamCard({ ram }: RamCardProps): React.JSX.Element {
-  const dpr = window.devicePixelRatio;
-  const { t } = useTranslation();
+  const dpr = window.devicePixelRatio
+  const { t } = useTranslation()
 
   return (
     <>
       <li>
         <div
           className="card"
-          style={{
-            '--dpr': dpr,
-            display: 'grid',
-            gridTemplateColumns: '100px 150px',
-            gap: '0px',
-            alignItems: 'center',
-            textAlign: 'center',
-            fontSize: '18px',
-          } as React.CSSProperties}
+          style={
+            {
+              '--dpr': dpr,
+              display: 'grid',
+              gridTemplateColumns: '100px 150px',
+              gap: '0px',
+              alignItems: 'center',
+              textAlign: 'center',
+              fontSize: '18px'
+            } as React.CSSProperties
+          }
         >
           <div className="hardware-icon">
             <img src={'./hardware_icons/ram.png'} alt="ram-icon" />
@@ -41,16 +43,18 @@ export default function RamCard({ ram }: RamCardProps): React.JSX.Element {
         <li key={index}>
           <div
             className="card"
-            style={{
-              '--dpr': dpr,
-              display: 'grid',
-              gridTemplateColumns: '100px 150px',
-              gap: '0px',
-              alignItems: 'center',
-              textAlign: 'center',
-              fontSize: '18px',
-              overflowWrap: 'break-word',
-            } as React.CSSProperties}
+            style={
+              {
+                '--dpr': dpr,
+                display: 'grid',
+                gridTemplateColumns: '100px 150px',
+                gap: '0px',
+                alignItems: 'center',
+                textAlign: 'center',
+                fontSize: '18px',
+                overflowWrap: 'break-word'
+              } as React.CSSProperties
+            }
           >
             <div className="hardware-icon">
               <img src={'./hardware_icons/ram.png'} alt="ram-icon" />
@@ -68,5 +72,5 @@ export default function RamCard({ ram }: RamCardProps): React.JSX.Element {
         </li>
       ))}
     </>
-  );
+  )
 }

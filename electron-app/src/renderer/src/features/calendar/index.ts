@@ -1,1 +1,1 @@
-﻿export { default as CalendarWidget } from './components/CalendarWidget';
+﻿export { default as CalendarWidget } from './components/CalendarWidget'

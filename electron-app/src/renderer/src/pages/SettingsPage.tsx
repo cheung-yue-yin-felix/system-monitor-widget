@@ -1,5 +1,5 @@
-﻿import { SettingsPanel } from '../features/settings';
+﻿import { SettingsPanel } from '../features/settings'
 
-export default function SettingsPage() {
-  return <SettingsPanel />;
+export default function SettingsPage(): React.JSX.Element {
+  return <SettingsPanel />
 }

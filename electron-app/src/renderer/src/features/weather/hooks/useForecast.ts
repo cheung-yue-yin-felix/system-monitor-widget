@@ -1,39 +1,37 @@
-﻿import { useEffect, useState } from 'react';
-import { fetchForecastWeather } from '../../../api/weather';
-import type { UseForecastResult } from '../../../types/weather';
+﻿import { useEffect, useState } from 'react'
+import { fetchForecastWeather } from '../../../api/weather'
+import type { UseForecastResult } from '../../../types/weather'
 
 export function useForecast(language: string): UseForecastResult {
-  const [weather, setWeather] = useState<UseForecastResult['weather']>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<Error | null>(null);
+  const [weather, setWeather] = useState<UseForecastResult['weather']>(null)
+  const [loading, setLoading] = useState<boolean>(true)
+  const [error, setError] = useState<Error | null>(null)
 
   useEffect(() => {
-    let isInitial = true;
+    let isInitial = true
 
-    const fetchWeatherData = async () => {
+    const fetchWeatherData = async (): Promise<void> => {
       try {
         if (isInitial) {
-          setLoading(true);
+          setLoading(true)
         }
-        setError(null);
+        setError(null)
 
-        const data = await fetchForecastWeather(language);
-        setWeather(data as UseForecastResult['weather']);
+        const data = await fetchForecastWeather(language)
+        setWeather(data as UseForecastResult['weather'])
       } catch (err) {
-        console.error(err);
-        setError(
-          err instanceof Error ? err : new Error('Failed to fetch weather data')
-        );
+        console.error(err)
+        setError(err instanceof Error ? err : new Error('Failed to fetch weather data'))
       } finally {
         if (isInitial) {
-          setLoading(false);
-          isInitial = false;
+          setLoading(false)
+          isInitial = false
         }
       }
-    };
+    }
 
-    fetchWeatherData();
-  }, [language]);
+    fetchWeatherData()
+  }, [language])
 
-  return { weather, loading, error };
+  return { weather, loading, error }
 }

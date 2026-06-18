@@ -1,1 +1,1 @@
-﻿export { useMetricsStream } from './useMetricsStream';
+﻿export { useMetricsStream } from './useMetricsStream'

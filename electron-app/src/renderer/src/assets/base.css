@@ -6,6 +6,8 @@
   text-shadow: 1px 1px 2px black;
 }
 
-html, body, #root {
+html,
+body,
+#root {
   background: transparent !important;
 }
