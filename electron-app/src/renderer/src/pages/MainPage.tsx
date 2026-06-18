@@ -1,6 +1,6 @@
-﻿import MainPanel from '../components/MainPanel';
-import ForecastPanel from '../components/ForecastPanel';
-import type React from 'react';
+﻿import MainPanel from '../components/MainPanel'
+import ForecastPanel from '../components/ForecastPanel'
+import type React from 'react'
 
 export default function MainPage(): React.JSX.Element {
   return (
@@ -8,5 +8,5 @@ export default function MainPage(): React.JSX.Element {
       <MainPanel />
       <ForecastPanel />
     </ul>
-  );
+  )
 }

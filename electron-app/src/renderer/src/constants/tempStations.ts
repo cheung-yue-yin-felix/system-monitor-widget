@@ -16,5 +16,5 @@
   WC: ['HPV'],
   WTS: ['WTS'],
   YTM: ['KP', 'HKO'],
-  YL: ['LFS', 'SK', 'YLP'],
-} as const;
+  YL: ['LFS', 'SK', 'YLP']
+} as const

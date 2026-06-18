@@ -5,8 +5,8 @@ import { electronAPI } from '@electron-toolkit/preload'
 const api = {
   weather: {
     getCurrent: (language: string) => ipcRenderer.invoke('weather:getCurrent', language),
-    getForecast: (language: string) => ipcRenderer.invoke('weather:getForecast', language),
-  },
+    getForecast: (language: string) => ipcRenderer.invoke('weather:getForecast', language)
+  }
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

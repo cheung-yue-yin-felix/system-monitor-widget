@@ -1,1 +1,1 @@
-﻿export { useSettingsPanel } from './useSettingsPanel';
+﻿export { useSettingsPanel } from './useSettingsPanel'

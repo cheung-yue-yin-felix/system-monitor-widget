@@ -5,7 +5,7 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { spawn, exec } from 'child_process'
 import { existsSync } from 'fs'
-import { registerWeatherIpcHandlers } from './ipc/weatherIpc';
+import { registerWeatherIpcHandlers } from './ipc/weatherIpc'
 
 function manageAdminStartup(enable: boolean = true): void {
   if (process.platform !== 'win32' || is.dev) {
@@ -13,7 +13,7 @@ function manageAdminStartup(enable: boolean = true): void {
     return
   }
 
-  const taskName: string = "SystemMonitorWidgetAdminStartup"
+  const taskName: string = 'SystemMonitorWidgetAdminStartup'
   const appPath: string = app.getPath('exe')
 
   let command: string = ''
@@ -45,8 +45,8 @@ function identifyMonitors(displays: Electron.Display[]): void {
       webPreferences: {
         preload: join(__dirname, '../preload/index.js'),
         contextIsolation: true,
-        sandbox: false,
-      },
+        sandbox: false
+      }
     })
 
     if (screen.getPrimaryDisplay().id === display.id) {
@@ -83,9 +83,9 @@ function createWindow(page: string, display: Electron.Display): void {
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       contextIsolation: true,
-      sandbox: false,
-    },
-  });
+      sandbox: false
+    }
+  })
 
   if (screen.getPrimaryDisplay().id === display.id) {
     window.setSize(display.workArea.width, display.workArea.height)
@@ -117,7 +117,7 @@ function toPascalCase(str: string): string {
   return str
     .toLowerCase()
     .replace(/[^\w\s-]/g, '') // Remove punctuation
-    .replace(/(?:^|[^a-zA-Z0-9]+)(.)/g, (_, chr) => chr.toUpperCase());
+    .replace(/(?:^|[^a-zA-Z0-9]+)(.)/g, (_, chr) => chr.toUpperCase())
 }
 
 function createTrayMenu(displays: Electron.Display[]): void {
@@ -131,7 +131,7 @@ function createTrayMenu(displays: Electron.Display[]): void {
 
   template.push({ type: 'separator' })
 
-  pages.forEach(page => {
+  pages.forEach((page) => {
     const subMenu: MenuItemConstructorOptions[] = []
 
     displays.forEach((display, index) => {
@@ -141,14 +141,23 @@ function createTrayMenu(displays: Electron.Display[]): void {
       })
     })
 
-    template.push({ label: page.length > 0 ? `Open ${toPascalCase(page)}` : 'Open Main', type: 'submenu', submenu: subMenu })
+    template.push({
+      label: page.length > 0 ? `Open ${toPascalCase(page)}` : 'Open Main',
+      type: 'submenu',
+      submenu: subMenu
+    })
   })
 
   template.push({ type: 'separator' })
 
-  template.push({ label: 'Auto Start', type: "checkbox", checked: true, click: (item) => manageAdminStartup(item.checked)})
+  template.push({
+    label: 'Auto Start',
+    type: 'checkbox',
+    checked: true,
+    click: (item) => manageAdminStartup(item.checked)
+  })
 
-  template.push({ type: "separator" })
+  template.push({ type: 'separator' })
 
   template.push({
     label: 'Close All Windows',
@@ -244,4 +253,3 @@ app.on('window-all-closed', () => {
   //   app.quit()
   // }
 })
-

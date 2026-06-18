@@ -1,8 +1,8 @@
-﻿import { useContext } from 'react';
-import SettingsContext from '../context/settings-context';
-import type { SettingsContextValue } from '../types/settings';
+﻿import { useContext } from 'react'
+import SettingsContext from '../context/settings-context'
+import type { SettingsContextValue } from '../types/settings'
 
-const STORAGE_KEY = 'system-monitor-settings';
+const STORAGE_KEY = 'system-monitor-settings'
 
 export const DEFAULT_SETTINGS: SettingsContextValue = {
   language: 'en',
@@ -16,10 +16,11 @@ export const DEFAULT_SETTINGS: SettingsContextValue = {
   setTimeFormat: () => {},
   setWeekDayFormat: () => {},
   setDistrict: () => {},
-  setTempStation: () => {},
-};
+  setTempStation: () => {}
+}
 
-export function loadSettings(): Omit<SettingsContextValue,
+export function loadSettings(): Omit<
+  SettingsContextValue,
   | 'setLanguage'
   | 'setDateFormat'
   | 'setTimeFormat'
@@ -28,30 +29,30 @@ export function loadSettings(): Omit<SettingsContextValue,
   | 'setTempStation'
 > {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    const parsed = raw ? JSON.parse(raw) : {};
+    const raw = localStorage.getItem(STORAGE_KEY)
+    const parsed = raw ? JSON.parse(raw) : {}
     return {
       ...DEFAULT_SETTINGS,
-      ...parsed,
-    };
+      ...parsed
+    }
   } catch (error) {
-    console.error(error);
-    return { ...DEFAULT_SETTINGS };
+    console.error(error)
+    return { ...DEFAULT_SETTINGS }
   }
 }
 
-export function saveSettings(settings: Record<string, unknown>) {
+export function saveSettings(settings: Record<string, unknown>): void {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(settings))
   } catch {
     // ignore write errors
   }
 }
 
 export function useSettings(): SettingsContextValue {
-  const context = useContext(SettingsContext);
+  const context = useContext(SettingsContext)
   if (!context) {
-    throw new Error('useSettings must be used within a SettingsProvider');
+    throw new Error('useSettings must be used within a SettingsProvider')
   }
-  return context;
+  return context
 }

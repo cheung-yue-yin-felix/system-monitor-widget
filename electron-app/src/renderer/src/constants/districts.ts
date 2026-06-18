@@ -16,5 +16,5 @@
   'WC',
   'WTS',
   'YTM',
-  'YL',
-] as const;
+  'YL'
+] as const

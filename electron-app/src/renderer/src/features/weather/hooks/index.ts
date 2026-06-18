@@ -1,2 +1,2 @@
-﻿export { useWeather } from './useWeather';
-export { useForecast } from './useForecast';
+﻿export { useWeather } from './useWeather'
+export { useForecast } from './useForecast'

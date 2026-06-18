@@ -1,6 +1,6 @@
-﻿import { createContext } from 'react';
-import type { SettingsContextValue } from '../types/settings';
+﻿import { createContext } from 'react'
+import type { SettingsContextValue } from '../types/settings'
 
-const SettingsContext = createContext<SettingsContextValue | null>(null);
+const SettingsContext = createContext<SettingsContextValue | null>(null)
 
-export default SettingsContext;
+export default SettingsContext
