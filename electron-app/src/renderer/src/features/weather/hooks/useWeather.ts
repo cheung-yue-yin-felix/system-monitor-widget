@@ -1,5 +1,6 @@
 ﻿import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import i18n from '../../../i18n'
 import { fetchCurrentWeather } from '../../../api/weather'
 import type { WeatherData } from '../../../types/weather'
 
@@ -17,6 +18,10 @@ export function useWeather(
   const translatedTempStation = useMemo(() => t(`stations.${tempStation}`), [t, tempStation])
 
   useEffect(() => {
+    if (i18n.language !== language) {
+      return
+    }
+
     let isInitial = true
 
     const fetchWeatherData = async (): Promise<void> => {

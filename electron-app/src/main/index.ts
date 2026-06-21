@@ -7,6 +7,14 @@ import { spawn, exec } from 'child_process'
 import { existsSync } from 'fs'
 import { registerWeatherIpcHandlers } from './ipc/weatherIpc'
 import { registerSettingsIpcHandlers } from './ipc/settingsIpc'
+import {
+  trackWindow,
+  getSavedWindows,
+  flushPendingSave,
+  setQuitting,
+  getIsQuitting
+} from './windowManager'
+import type { WindowState } from '../shared/types/window'
 
 function manageAdminStartup(enable: boolean = true): void {
   if (process.platform !== 'win32' || is.dev) {
@@ -73,10 +81,12 @@ function identifyMonitors(displays: Electron.Display[]): void {
   })
 }
 
-function createWindow(page: string, display: Electron.Display): void {
+function isWindowState(target: Electron.Display | WindowState): target is WindowState {
+  return (target as WindowState).displayId !== undefined
+}
+
+function createWindow(page: string, target: Electron.Display | WindowState): BrowserWindow {
   const window = new BrowserWindow({
-    x: display.workArea.x,
-    y: display.workArea.y,
     transparent: true,
     frame: false,
     show: false,
@@ -88,10 +98,29 @@ function createWindow(page: string, display: Electron.Display): void {
     }
   })
 
-  if (screen.getPrimaryDisplay().id === display.id) {
-    window.setSize(display.workArea.width, display.workArea.height)
+  let display: Electron.Display
+
+  if (isWindowState(target)) {
+    display =
+      screen.getAllDisplays().find((d) => d.id === target.displayId) ??
+      screen.getDisplayNearestPoint({ x: target.x, y: target.y })
+
+    window.setPosition(target.x, target.y)
+
+    if (target.fullScreen) {
+      window.setFullScreen(true)
+    } else {
+      window.setSize(target.width, target.height)
+    }
   } else {
-    window.setFullScreen(true)
+    display = target
+    window.setPosition(display.workArea.x, display.workArea.y)
+
+    if (screen.getPrimaryDisplay().id === display.id) {
+      window.setSize(display.workArea.width, display.workArea.height)
+    } else {
+      window.setFullScreen(true)
+    }
   }
 
   window.on('ready-to-show', () => {
@@ -110,6 +139,16 @@ function createWindow(page: string, display: Electron.Display): void {
   } else {
     window.loadFile(join(__dirname, '../renderer/index.html'))
   }
+
+  trackWindow(window, page)
+  return window
+}
+
+function restoreWindows(): void {
+  const saved = getSavedWindows()
+  saved.forEach((state) => {
+    createWindow(state.page, state)
+  })
 }
 
 let tray: Tray | null = null
@@ -221,6 +260,7 @@ app.whenReady().then(() => {
   }
 
   createTrayMenu(displays)
+  restoreWindows()
 
   function killBackend(): void {
     if (!backend) return
@@ -235,8 +275,14 @@ app.whenReady().then(() => {
     }
   }
 
-  app.on('before-quit', killBackend)
-  app.on('will-quit', killBackend)
+  app.on('before-quit', () => {
+    setQuitting(true)
+    flushPendingSave()
+    killBackend()
+  })
+  app.on('will-quit', () => {
+    killBackend()
+  })
 
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the
@@ -251,7 +297,22 @@ app.whenReady().then(() => {
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
+  if (!getIsQuitting()) {
+    flushPendingSave()
+  }
   // if (process.platform !== 'darwin') {
   //   app.quit()
   // }
+})
+
+process.on('SIGINT', () => {
+  setQuitting(true)
+  flushPendingSave()
+  app.quit()
+})
+
+process.on('SIGTERM', () => {
+  setQuitting(true)
+  flushPendingSave()
+  app.quit()
 })
