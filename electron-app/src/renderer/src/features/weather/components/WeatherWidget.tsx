@@ -39,6 +39,10 @@ export default function WeatherWidget(): React.JSX.Element {
 
   if (error) return <ErrorMessage error={error} />
 
+  if (!weather || !weather.temperature || !weather.rainfall || !weather.humidity) {
+    return <Loading />
+  }
+
   return (
     <div className="card" style={cardStyle}>
       <div style={{ gridColumn: '1 / 4', fontSize: '18px' }}>
