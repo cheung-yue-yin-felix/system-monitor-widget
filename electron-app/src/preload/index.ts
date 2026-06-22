@@ -1,6 +1,7 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 import type { Settings } from '../shared/types/settings'
+import type { HardwareMetrics } from '../shared/types/hardware'
 
 // Custom APIs for renderer
 const api = {
@@ -15,6 +16,20 @@ const api = {
       const handler = (_: unknown, settings: Settings): void => callback(settings)
       ipcRenderer.on('settings:changed', handler)
       return () => ipcRenderer.off('settings:changed', handler)
+    }
+  },
+  metrics: {
+    subscribe: () => ipcRenderer.send('metrics:subscribe'),
+    unsubscribe: () => ipcRenderer.send('metrics:unsubscribe'),
+    onUpdate: (callback: (data: HardwareMetrics) => void) => {
+      const handler = (_: unknown, data: HardwareMetrics) => callback(data)
+      ipcRenderer.on('metrics:update', handler)
+      return () => ipcRenderer.off('metrics:update', handler)
+    },
+    onStatus: (callback: (status: string) => void) => {
+      const handler = (_: unknown, status: string) => callback(status)
+      ipcRenderer.on('metrics:status', handler)
+      return () => ipcRenderer.off('metrics:status', handler)
     }
   }
 }

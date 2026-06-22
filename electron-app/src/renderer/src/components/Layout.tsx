@@ -1,6 +1,8 @@
-﻿import { Link, Outlet, useLocation } from 'react-router-dom'
+﻿import { Suspense } from 'react'
+import { Link, Outlet, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useCallback, useMemo } from 'react'
+import Loading from './Loading'
 
 export default function Layout(): React.JSX.Element {
   const { t } = useTranslation()
@@ -68,7 +70,9 @@ export default function Layout(): React.JSX.Element {
           maxWidth: '960px'
         }}
       >
-        <Outlet />
+        <Suspense fallback={<Loading/>}>
+          <Outlet />
+        </Suspense>
       </main>
     </div>
   )

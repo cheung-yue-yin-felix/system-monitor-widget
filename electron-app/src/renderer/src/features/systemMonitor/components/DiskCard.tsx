@@ -1,6 +1,6 @@
 ﻿import { useTranslation } from 'react-i18next'
 import type React from 'react'
-import type { DiskMetrics } from '../../../types/hardware'
+import type { DiskMetrics } from '../../../../../shared/types/hardware'
 
 interface DiskCardProps {
   disk: DiskMetrics

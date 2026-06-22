@@ -1,6 +1,6 @@
 ﻿import { useTranslation } from 'react-i18next'
 import type React from 'react'
-import type { NetworkMetrics } from '../../../types/hardware'
+import type { NetworkMetrics } from '../../../../../shared/types/hardware'
 
 interface NetworkCardProps {
   networks: NetworkMetrics[]

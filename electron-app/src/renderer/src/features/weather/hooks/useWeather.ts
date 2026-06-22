@@ -18,7 +18,7 @@ export function useWeather(
   const translatedTempStation = useMemo(() => t(`stations.${tempStation}`), [t, tempStation])
 
   useEffect(() => {
-    if (i18n.language !== language) {
+    if (i18n.language !== language || !i18n.hasResourceBundle(language, 'common')) {
       return
     }
 

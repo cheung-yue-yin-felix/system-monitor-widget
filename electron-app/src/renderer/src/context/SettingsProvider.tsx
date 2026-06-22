@@ -2,7 +2,8 @@
 import SettingsContext from './settings-context'
 import { loadSettings, saveSettings } from '../hooks/useSettings'
 import type { Language, Settings, SettingsContextValue } from '../types/settings'
-import i18n from '../i18n'
+import { changeAppLanguage } from '../i18n'
+import Loading from '../components/Loading'
 
 interface SettingsProviderProps {
   children: ReactNode
@@ -10,6 +11,7 @@ interface SettingsProviderProps {
 
 const SettingsProvider = ({ children }: SettingsProviderProps): React.JSX.Element => {
   const [settings, setSettings] = useState<Settings>(() => loadSettings())
+  const [i18nReady, setI18nReady] = useState(false)
 
   useEffect(() => {
     window.api.settings
@@ -33,8 +35,21 @@ const SettingsProvider = ({ children }: SettingsProviderProps): React.JSX.Elemen
   }, [settings])
 
   useEffect(() => {
+    let cancelled = false
+
     document.documentElement.lang = settings.language
-    i18n.changeLanguage(settings.language)
+
+    changeAppLanguage(settings.language)
+      .then(() => {
+        if (!cancelled) setI18nReady(true)
+      })
+      .catch((error) => {
+        console.error('[SettingsProvider] Failed to load locale:', error)
+      })
+
+    return () => {
+      cancelled = true
+    }
   }, [settings.language])
 
   const updateSettings = useCallback((updater: (prev: Settings) => Settings) => {
@@ -112,6 +127,8 @@ const SettingsProvider = ({ children }: SettingsProviderProps): React.JSX.Elemen
       setTempStation
     ]
   )
+
+  if (!i18nReady) return <Loading />
 
   return <SettingsContext.Provider value={value}>{children}</SettingsContext.Provider>
 }

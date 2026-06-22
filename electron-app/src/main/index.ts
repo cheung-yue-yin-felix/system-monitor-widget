@@ -7,6 +7,7 @@ import { spawn, exec } from 'child_process'
 import { existsSync } from 'fs'
 import { registerWeatherIpcHandlers } from './ipc/weatherIpc'
 import { registerSettingsIpcHandlers } from './ipc/settingsIpc'
+import { registerMetricsIpcHandlers } from './ipc/metricsIpc'
 import {
   trackWindow,
   getSavedWindows,
@@ -229,6 +230,7 @@ app.whenReady().then(() => {
 
   registerWeatherIpcHandlers()
   registerSettingsIpcHandlers()
+  registerMetricsIpcHandlers()
 
   const displays: Electron.Display[] = screen.getAllDisplays()
 

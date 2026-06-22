@@ -1,6 +1,6 @@
 ﻿import { useTranslation } from 'react-i18next'
 import type React from 'react'
-import type { GpuMetrics } from '../../../types/hardware'
+import type { GpuMetrics } from '../../../../../shared/types/hardware'
 
 interface GpuCardProps {
   gpu: GpuMetrics

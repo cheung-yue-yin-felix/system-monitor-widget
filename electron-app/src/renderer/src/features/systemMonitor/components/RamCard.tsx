@@ -1,6 +1,6 @@
 ﻿import { useTranslation } from 'react-i18next'
 import type React from 'react'
-import type { RamMetrics } from '../../../types/hardware'
+import type { RamMetrics } from '../../../../../shared/types/hardware'
 
 interface RamCardProps {
   ram: RamMetrics

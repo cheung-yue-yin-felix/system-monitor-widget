@@ -1,9 +1,11 @@
-﻿import { createHashRouter, RouteObject } from 'react-router-dom'
+﻿import { lazy } from 'react'
+import { createHashRouter, RouteObject } from 'react-router-dom'
 import Layout from './components/Layout'
-import SettingsPage from './pages/SettingsPage'
-import MainPage from './pages/MainPage'
-import SystemPage from './pages/SystemPage'
 import MonitorsPage from './pages/MonitorsPage'
+
+const MainPage = lazy(() => import('./pages/MainPage'))
+const SystemPage = lazy(() => import('./pages/SystemPage'))
+const SettingsPage = lazy(() => import('./pages/SettingsPage'))
 
 const routes: RouteObject[] = [
   {

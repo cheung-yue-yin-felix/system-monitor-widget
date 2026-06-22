@@ -18,6 +18,14 @@ declare global {
         onChange: (
           callback: (settings: import('../shared/types/settings').Settings) => void
         ) => () => void
+      },
+      metrics: {
+        subscribe: () => void
+        unsubscribe: () => void
+        onUpdate: (
+          callback: (data: import('../shared/types/hardware').HardwareMetrics) => void
+        ) => () => void
+        onStatus: (callback: (status: string) => void) => () => void
       }
     }
   }
